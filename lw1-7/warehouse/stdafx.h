@@ -4,12 +4,12 @@
 
 #include <stdio.h>
 #include <tchar.h>
-#include <vector>
+#include <iostream>
 #include <string>
+#include <numeric>
+#include <sstream>
+#include <vector>
+#include <list>
+#include <exception>
 #include <functional>
 #include <algorithm>
-#include <iterator>
-#include <memory>
-#include <exception>
-#include <map>
-#include <iostream>
