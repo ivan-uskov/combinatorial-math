@@ -13,3 +13,5 @@
 #include <exception>
 #include <functional>
 #include <algorithm>
+
+bool InRange(std::pair<unsigned, unsigned> const& range, unsigned num);
