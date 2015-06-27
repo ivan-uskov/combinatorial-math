@@ -7,3 +7,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <math.h>
+#include <fstream>
+#include <functional>
