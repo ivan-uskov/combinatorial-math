@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Matrix::Matrix(size_t length, vector<int> const& values)
+Matrix::Matrix(size_t length, vector<double> const& values)
 {
     if (pow(length, 2) != values.size())
     {
@@ -21,7 +21,7 @@ size_t Matrix::GetLength()const
 
 Matrix Matrix::GetDegreeMatrix()const
 {
-    Matrix mtx(length, vector<int>(ElementsCount(), 0));
+    Matrix mtx(length, vector<double>(ElementsCount(), 0));
 
     for (unsigned y = 0; y < length; ++y)
     {
@@ -38,7 +38,7 @@ Matrix Matrix::GetDegreeMatrix()const
 
 Matrix Matrix::GetAdditionMatrix(size_t dx, size_t dy)const
 {
-    vector<int> additionValues;
+    vector<double> additionValues;
 
     for (size_t y = 0; y < length; ++y)
     {
@@ -54,35 +54,63 @@ Matrix Matrix::GetAdditionMatrix(size_t dx, size_t dy)const
     return Matrix(length - 1, additionValues);
 }
 
-size_t Matrix::FindInCol(size_t col, function<bool(int)> const& comp)const
+void Matrix::SwitchToNotZeroRow(size_t x)
+{
+    if (DblsEqual((*this)(x, x), 0))
+    {
+        for (size_t y = 0; y < length; ++y)
+        {
+            if (!DblsEqual((*this)(x, y), 0))
+            {
+                SwapRows(x, y);
+                break;
+            }
+
+            if (y + 1 == length)
+            {
+                throw domain_error("can't create diagonal matrix");
+            }
+        }
+    }
+}
+
+std::vector<double> Matrix::GetRowDeletedOnFirstElement(size_t x)const
+{
+    auto row = GetRow(x);
+    for (size_t i = 0; i < length; ++i)
+    {
+        row[i] /= (*this)(x, x);
+    }
+
+    return row;
+}
+
+void Matrix::MakeColumnZero(std::vector<double> const& row, size_t x)
 {
     for (size_t y = 0; y < length; ++y)
     {
-        if (comp((*this)(col, y)))
+        if (y != x)
         {
-            return y;
+            for (size_t i = x; i < length; ++i)
+            {
+                (*this)(y, i) -= row[i] * (*this)(x, y);
+            }
         }
     }
-
-    throw domain_error("Not Found");
-}
-
-size_t Matrix::FindInRow(size_t row, function<bool(int)> const& comp)const
-{
-    for (size_t x = 0; x < length; ++x)
-    {
-        if (comp((*this)(x, row)))
-        {
-            return x;
-        }
-    }
-
-    return length;
 }
 
 Matrix Matrix::GetDiagonalMatrix()const
 {
+    Matrix mtx(*this);
 
+    for (size_t x = 0; x < length; ++x)
+    {
+        mtx.SwitchToNotZeroRow(x);
+        auto row = mtx.GetRowDeletedOnFirstElement(x);
+        mtx.MakeColumnZero(row, x);
+    }
+
+    return mtx;
 }
 
 size_t Matrix::GetDeterminant()const
@@ -101,6 +129,14 @@ size_t Matrix::GetDeterminant()const
 size_t Matrix::GetCountSpanningTrees()const
 {
     return (GetDegreeMatrix() - *this).GetAdditionMatrix(1, 1).GetDeterminant();
+}
+
+std::vector<double> Matrix::GetRow(size_t y)const
+{
+    auto beg = values.begin() + y * length;
+    auto end = beg + length;
+
+    return vector<double>(beg, end);
 }
 
 size_t Matrix::ElementsCount()const
@@ -124,12 +160,12 @@ void Matrix::SwapCols(size_t lhs, size_t rhs)
     }
 }
 
-int & Matrix::operator () (size_t x, size_t y)
+double & Matrix::operator () (size_t x, size_t y)
 {
     return values.at(y * length + x);
 }
 
-int const& Matrix::operator () (size_t x, size_t y)const
+double const& Matrix::operator () (size_t x, size_t y)const
 {
     return values.at(y * length + x);
 }
@@ -142,7 +178,7 @@ Matrix operator - (Matrix const& lhs, Matrix const& rhs)
         throw invalid_argument("Sub Matrixies with different length!");
     }
 
-    Matrix mtx(length, vector<int>(lhs.ElementsCount(), 0));
+    Matrix mtx(length, vector<double>(lhs.ElementsCount(), 0));
     for (size_t y = 0; y < length; ++y)
     {
         for (size_t x = 0; x < length; ++x)

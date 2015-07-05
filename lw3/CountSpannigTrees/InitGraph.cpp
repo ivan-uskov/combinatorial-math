@@ -3,10 +3,10 @@
 
 using namespace std;
 
-vector<int> ReadGraphValues(istream & in, unsigned length)
+vector<double> ReadGraphValues(istream & in, unsigned length)
 {
-    unsigned num;
-    vector<int> values;
+    double num;
+    vector<double> values;
 
     for (unsigned i = 0; (in >> num) && (i < length); ++i)
     {

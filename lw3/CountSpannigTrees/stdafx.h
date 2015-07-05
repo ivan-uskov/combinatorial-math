@@ -9,4 +9,7 @@
 #include <iostream>
 #include <math.h>
 #include <fstream>
+#include <algorithm>
 #include <functional>
+
+bool DblsEqual(double lhs, double rhs);
